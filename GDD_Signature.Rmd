@@ -1,0 +1,68 @@
+---
+title: "GDD Signature"
+author: "Dr. John R. Withrow, Jr."
+date: "January 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Reading in file
+
+```{r analysis}
+x <- read.csv("C:\\Users\\johnwithrow\\Desktop\\Projects\\GDDSignature\\RI_GM_Oak_SampledFinal_011317.csv",header=TRUE)
+colnames(x)[5] <- "GM"
+#colnames(x)
+#class(x$GM)
+#x$Date
+lb <- rgb(0,0,1,0.05)
+lr <- rgb(1,0,0,0.05)
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$NBR,col=lb,main = "NBR Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$NBR,col=lr,main = "NBR Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$NDMI,col=lb,main = "NDMI Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$NDMI,col=lr,main = "NDMI Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$NDSI,col=lb,main = "NDSI Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$NDSI,col=lr,main = "NDSI Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$NDVI,col=lb,main = "NDVI Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$NDVI,col=lr,main = "NDVI Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$blue,col=lb,main = "Blue Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$blue,col=lr,main = "Blue Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$green,col=lb,main = "Green Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$green,col=lr,main = "Green Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$nir,col=lb,main = "NIR Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$nir,col=lr,main = "NIR Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$red,col=lb,main = "Red Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$red,col=lr,main = "Red Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$swir1,col=lb,main = "SWIR1 Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$swir1,col=lr,main = "SWIR1 Band With GM")
+plot(x[x$GM==0,]$GDD,x[x$GM==0,]$swir2,col=lb,main = "SWIR2 Band No GM")
+plot(x[x$GM==1,]$GDD,x[x$GM==1,]$swir2,col=lr,main = "SWIR2 Band With GM")
+x0 <- x[x$GM==0,]
+x1 <- x[x$GM==1,]
+n0 <- dim(x0)[1]
+n1 <- dim(x1)[1]
+dNBR <- .05
+dGDD <- 100
+NBRint0 <- floor((x0$NBR - min(x$NBR))/dNBR) + 1
+GDDint0 <- floor((x0$GDD - min(x$GDD))/dGDD) + 1
+m <- max(GDDint0)
+n <- max(NBRint0)
+matNBR0 <- matrix(data=rep(0,m*n),nrow=n,ncol=m)
+for (i in 1:length(NBRint0)) { matNBR0[NBRint0[i],GDDint0[i]] <- matNBR0[NBRint0[i],GDDint0[i]] + 1 }
+NBRint1 <- floor((x1$NBR - min(x$NBR))/dNBR) + 1
+GDDint1 <- floor((x1$GDD - min(x$GDD))/dGDD) + 1
+matNBR1 <- matrix(data=rep(0,m*n),nrow=n,ncol=m)
+for (i in 1:length(NBRint1)) { matNBR1[NBRint1[i],GDDint1[i]] <- matNBR1[NBRint1[i],GDDint1[i]] + 1 }
+betaMean <- function(a,b) { (a+1)/(a+b+2) }
+pI <- function(n1,nG1,n0,nG0) { betaMean(nG1+1,n1-nG1+1)*betaMean(n1+1,n0+1)/(betaMean(nG1+1,n1-nG1+1)*betaMean(n1+1,n0+1) + betaMean(nG0+1,n0-nG0+1)*betaMean(n0+1,n1+1)) }
+matP <- matrix(data=rep(0,m*n),nrow=n,ncol=m)
+for (i in 1:n) { for (j in 1:m) { matP[i,j] <- pI(n1,matNBR1[i,j],n0,matNBR0[i,j]) }}
+matP
+library(graphics)
+filled.contour(matP,nlevels=20,col=cm.colors(19))
+```
+
